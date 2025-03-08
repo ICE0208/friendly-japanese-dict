@@ -23,6 +23,7 @@ const SearchForm = ({
   const [inputValue, setInputValue] = useState(initialValue || "");
   const [localShowSuggestions, setLocalShowSuggestions] =
     useState(showSuggestions);
+  const [selectedIndex, setSelectedIndex] = useState(-1);
   const formRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -33,7 +34,12 @@ const SearchForm = ({
     setLocalShowSuggestions(showSuggestions);
   }, [showSuggestions]);
 
-  // 외부 클릭 감지를 위한 이벤트 리스너 추가
+  useEffect(() => {
+    if (localShowSuggestions) {
+      setSelectedIndex(-1);
+    }
+  }, [localShowSuggestions]);
+
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (formRef.current && !formRef.current.contains(event.target as Node)) {
@@ -51,17 +57,16 @@ const SearchForm = ({
     setInputValue(e.target.value);
     onInputChange(e);
     setLocalShowSuggestions(true);
+    setSelectedIndex(-1);
   };
 
-  // 입력칸 클릭 시 연관 검색어 표시 및 API 요청
   const handleInputClick = () => {
     if (inputValue.trim() && !localShowSuggestions) {
-      // 입력값이 있고 현재 연관 검색어가 표시되지 않은 상태일 때만
       const fakeEvent = {
         target: { value: inputValue },
       } as React.ChangeEvent<HTMLInputElement>;
 
-      onInputChange(fakeEvent); // API 요청을 다시 트리거
+      onInputChange(fakeEvent);
       setLocalShowSuggestions(true);
     }
   };
@@ -71,8 +76,33 @@ const SearchForm = ({
     setLocalShowSuggestions(false);
   };
 
-  const handleKeyPress = (e: React.KeyboardEvent) => {
-    if (e.key === "Enter") {
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (localShowSuggestions && showSuggestions && suggestions.length > 0) {
+      switch (e.key) {
+        case "ArrowDown":
+          e.preventDefault();
+          setSelectedIndex((prev) =>
+            prev < suggestions.length - 1 ? prev + 1 : prev
+          );
+          break;
+        case "ArrowUp":
+          e.preventDefault();
+          setSelectedIndex((prev) => (prev > 0 ? prev - 1 : prev));
+          break;
+        case "Enter":
+          e.preventDefault();
+          if (selectedIndex >= 0) {
+            onSuggestionClick(suggestions[selectedIndex]);
+            setLocalShowSuggestions(false);
+          } else {
+            handleSearch();
+          }
+          break;
+        case "Escape":
+          setLocalShowSuggestions(false);
+          break;
+      }
+    } else if (e.key === "Enter") {
       handleSearch();
     }
   };
@@ -88,7 +118,7 @@ const SearchForm = ({
           value={inputValue}
           onChange={handleInputChange}
           onClick={handleInputClick}
-          onKeyPress={handleKeyPress}
+          onKeyDown={handleKeyDown}
           placeholder="일본어 단어를 입력하세요"
           className="w-full p-2 border border-gray-300 rounded"
         />
@@ -97,7 +127,11 @@ const SearchForm = ({
             {suggestions.map((suggestion, index) => (
               <button
                 key={`${index}`}
-                className="w-full px-4 py-2 text-left hover:bg-gray-100 focus:bg-gray-100 focus:outline-none text-gray-900 font-medium"
+                className={`w-full px-4 py-2 text-left focus:outline-none ${
+                  selectedIndex === index
+                    ? "bg-gray-200 text-gray-900 font-semibold"
+                    : "bg-white hover:bg-gray-100 text-gray-900 font-medium"
+                }`}
                 onClick={() => {
                   onSuggestionClick(suggestion);
                   setLocalShowSuggestions(false);
