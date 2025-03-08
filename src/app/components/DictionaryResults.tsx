@@ -16,9 +16,13 @@ interface DictionaryResult {
 
 interface DictionaryResultsProps {
   dictionaryResult: DictionaryResult;
+  onWordClick: (word: string) => void;
 }
 
-const DictionaryResults = ({ dictionaryResult }: DictionaryResultsProps) => {
+const DictionaryResults = ({
+  dictionaryResult,
+  onWordClick,
+}: DictionaryResultsProps) => {
   if (!dictionaryResult) {
     return null;
   }
@@ -45,7 +49,20 @@ const DictionaryResults = ({ dictionaryResult }: DictionaryResultsProps) => {
                         <span className="mr-2">{word.word}</span>
                         {word.wordWithKanji && (
                           <span className="text-gray-400 text-sm">
-                            ({word.wordWithKanji})
+                            (
+                            {word.wordWithKanji.split("·").map((part, i) => (
+                              <React.Fragment key={i}>
+                                <button
+                                  onClick={() => onWordClick(part)}
+                                  className="hover:text-blue-400 cursor-pointer"
+                                >
+                                  {part}
+                                </button>
+                                {i < word.wordWithKanji.split("·").length - 1 &&
+                                  " · "}
+                              </React.Fragment>
+                            ))}
+                            )
                           </span>
                         )}
                       </h4>
