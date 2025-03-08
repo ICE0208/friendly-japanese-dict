@@ -155,7 +155,7 @@ const SearchForm = ({
           onClick={handleInputClick}
           onKeyDown={handleKeyDown}
           placeholder="일본어 단어를 입력하세요"
-          className="w-full p-2 border border-gray-300 rounded"
+          className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-gray-400 focus:border-gray-400"
         />
         {localShowSuggestions && showSuggestions && suggestions.length > 0 && (
           <div
