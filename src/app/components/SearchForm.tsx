@@ -1,12 +1,13 @@
 import { useState, useEffect } from "react";
+import { SuggestionItem } from "../types/japanese";
 
 interface SearchFormProps {
   initialValue: string;
   onSearch: (value: string) => void;
-  suggestions: Array<{ key: string; item: string }>;
+  suggestions: Array<SuggestionItem>;
   showSuggestions: boolean;
   onInputChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
-  onSuggestionClick: (suggestion: { key: string; item: string }) => void;
+  onSuggestionClick: (suggestion: SuggestionItem) => void;
   loading: boolean;
 }
 
@@ -47,7 +48,7 @@ const SearchForm = ({
           type="text"
           value={inputValue}
           onChange={handleInputChange}
-          onKeyPress={handleKeyPress}
+          onKeyDown={handleKeyPress}
           placeholder="일본어 단어를 입력하세요"
           className="w-full p-2 border border-gray-300 rounded"
         />
@@ -55,11 +56,11 @@ const SearchForm = ({
           <div className="absolute w-full mt-1 bg-white border border-gray-200 rounded-md shadow-lg z-10 max-h-60 overflow-y-auto">
             {suggestions.map((suggestion, index) => (
               <button
-                key={`${suggestion.key}-${index}`}
+                key={`${index}`}
                 className="w-full px-4 py-2 text-left hover:bg-gray-100 focus:bg-gray-100 focus:outline-none text-gray-900 font-medium"
                 onClick={() => onSuggestionClick(suggestion)}
               >
-                {suggestion.item}
+                {suggestion.word} ({suggestion.reading}) - {suggestion.meaning}
               </button>
             ))}
           </div>

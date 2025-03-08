@@ -91,7 +91,9 @@ export default function JapaneseSearch() {
         const response = await fetch(
           `/api/naver-suggest?query=${encodeURIComponent(value)}`
         );
-        const data = await response.json();
+        const data = (await response.json()) as {
+          suggestions: SuggestionItem[];
+        };
         if (data && data.suggestions) {
           setSuggestions(data.suggestions);
           setShowSuggestions(data.suggestions.length > 0);
@@ -118,8 +120,19 @@ export default function JapaneseSearch() {
   };
 
   const handleSuggestionClick = (suggestion: SuggestionItem) => {
-    router.push(`?q=${encodeURIComponent(suggestion.key)}`);
-    setInputValue(suggestion.key);
+    const getFirstWord = (text: string) => {
+      const dotIndex = text.indexOf("∙");
+      const pipeIndex = text.indexOf("|");
+      const firstDelimiter = Math.min(
+        dotIndex === -1 ? Infinity : dotIndex,
+        pipeIndex === -1 ? Infinity : pipeIndex
+      );
+      return text.slice(0, firstDelimiter);
+    };
+
+    const query = getFirstWord(suggestion.word) || suggestion.reading;
+    router.push(`?q=${encodeURIComponent(query)}`);
+    setInputValue(query);
     setShowSuggestions(false);
   };
 

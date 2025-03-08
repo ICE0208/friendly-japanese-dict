@@ -1,9 +1,5 @@
+import { SuggestionItem } from "@/app/types/japanese";
 import { NextResponse } from "next/server";
-
-interface SuggestionItem {
-  key: string;
-  item: string;
-}
 
 // Define types for Naver API response
 type NaverSuggestionItem = string[][];
@@ -35,6 +31,7 @@ export async function GET(request: Request) {
 
     // Process main suggestions
     if (data.items && data.items[0]) {
+      console.log(data.items[0]);
       data.items[0].forEach((item: NaverSuggestionItem) => {
         if (item && item.length >= 4) {
           const reading = item[0][0]; // Hiragana reading
@@ -42,8 +39,9 @@ export async function GET(request: Request) {
           const meaning = item[3][0]; // Korean meaning
 
           suggestions.push({
-            key: word,
-            item: `${word} (${reading}) - ${meaning}`,
+            word,
+            reading,
+            meaning,
           });
         }
       });
@@ -58,8 +56,9 @@ export async function GET(request: Request) {
           const meaning = item[3][0]; // Korean meaning
 
           suggestions.push({
-            key: word,
-            item: `${word} (${reading}) - ${meaning}`,
+            word,
+            reading,
+            meaning,
           });
         }
       });

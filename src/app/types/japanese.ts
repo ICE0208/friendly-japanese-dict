@@ -28,8 +28,9 @@ export interface DictionaryResult {
 }
 
 export interface SuggestionItem {
-  key: string;
-  item: string;
+  word: string;
+  reading: string;
+  meaning: string;
 }
 
 export interface ExamplePiece {
