@@ -2,6 +2,10 @@
 
 이 프로젝트는 일본어 한자 및 단어를 검색하고 학습할 수 있는 웹 애플리케이션입니다. 다양한 사전 API를 활용하여 한자의 의미, 예문, 관련 단어 등을 제공합니다.
 
+## 데모
+
+🔗 [https://friendly-japanese-dict.vercel.app/](https://friendly-japanese-dict.vercel.app/)
+
 ## 주요 기능
 
 - 🔍 일본어 한자 및 단어 검색
