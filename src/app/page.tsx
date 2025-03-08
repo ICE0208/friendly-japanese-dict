@@ -5,7 +5,7 @@ export default function Home() {
     <div className="min-h-screen bg-white dark:bg-gray-900">
       <main className="container mx-auto px-4 py-8">
         <h1 className="text-4xl font-bold text-center mb-8 text-gray-900 dark:text-white">
-          漢字検索
+          친절한 일본어 사전 🈁
         </h1>
         <JapaneseSearch />
       </main>
