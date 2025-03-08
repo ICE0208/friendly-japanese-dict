@@ -155,20 +155,18 @@ export default function JapaneseSearch() {
 
       <div className="flex flex-col lg:flex lg:flex-row lg:gap-12">
         <div className="lg:w-1/2">
+          {query && dictionaryResult && (
+            <DictionaryResults dictionaryResult={dictionaryResult} />
+          )}
+          {query && exampleResults && exampleResults.results.length > 0 && (
+            <ExampleResults exampleResults={exampleResults} />
+          )}
           {searchResults && (
             <RelatedSearchResults
               searchResults={searchResults}
               onWordClick={handleWordClick}
               inputValue={inputValue}
             />
-          )}
-
-          {query && dictionaryResult && (
-            <DictionaryResults dictionaryResult={dictionaryResult} />
-          )}
-
-          {query && exampleResults && exampleResults.results.length > 0 && (
-            <ExampleResults exampleResults={exampleResults} />
           )}
         </div>
 

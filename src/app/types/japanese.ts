@@ -22,8 +22,15 @@ export interface JishoResult {
   }>;
 }
 
+export interface WordInfo {
+  word: string; // 발음 (표시되는 단어)
+  wordWithKanji: string; // 한자 포함 단어
+  meanings: string[]; // 뜻 목록
+}
+
 export interface DictionaryResult {
-  meanings: string[];
+  mainWord: WordInfo;
+  subWords: WordInfo[];
   dictionaryLink: string;
 }
 

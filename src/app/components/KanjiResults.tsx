@@ -14,7 +14,7 @@ const KanjiResults = ({ kanjiResults }: KanjiResultsProps) => {
 
   return (
     <div className="mb-6">
-      <h2 className="text-xl font-bold mb-3">한자 쓰는 방법</h2>
+      <h2 className="text-xl font-bold mb-3">한자 정보</h2>
       <div className="space-y-4">
         {Object.entries(kanjiResults).map(([kanji, result]) => (
           <Card key={kanji}>
