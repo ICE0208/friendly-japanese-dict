@@ -28,7 +28,7 @@
 1. 저장소를 클론합니다:
 
    ```bash
-   git clone https://github.com/yourusername/friendly-japanese-dict.git
+   git clone https://github.com/ICE0208/friendly-japanese-dict.git
    cd friendly-japanese-dict
    ```
 
