@@ -3,6 +3,8 @@
 import { useState, useEffect } from "react";
 import { jisho } from "../lib/jisho";
 import { useRouter, useSearchParams } from "next/navigation";
+import Card from "./Card";
+import SourceLink from "./SourceLink";
 
 interface KanjiResult {
   found: boolean;
@@ -202,106 +204,108 @@ export default function JapaneseSearch() {
         <div className="lg:w-1/2">
           {searchResults && (
             <div className="mb-6">
-              <h2 className="text-xl font-bold mb-2">연관 검색어</h2>
-              {searchResults.data?.[0]?.japanese?.map(
-                (item: JapaneseWord, index: number) => (
-                  <div
-                    key={index}
-                    className="mb-4"
-                  >
-                    <button
-                      onClick={() => {
-                        if (item.word) {
-                          router.push(`?q=${encodeURIComponent(item.word)}`);
-                          setInputValue(item.word);
-                        }
-                      }}
-                      className="px-2 py-1 rounded-md transition-colors hover:bg-gray-100 group font-medium cursor-pointer"
-                    >
-                      {item.word && (
-                        <span className="mr-2 group-hover:text-gray-900">
-                          {item.word}
-                        </span>
-                      )}
-                      {item.reading && (
-                        <span className="text-gray-600 group-hover:text-gray-600">
-                          ({item.reading})
-                        </span>
-                      )}
-                    </button>
+              <h2 className="text-xl font-bold mb-3">연관 검색어</h2>
+              <div className="space-y-4">
+                {searchResults.data?.[0]?.japanese?.map(
+                  (item: JapaneseWord, index: number) => (
+                    <Card key={index}>
+                      <button
+                        onClick={() => {
+                          if (item.word) {
+                            router.push(`?q=${encodeURIComponent(item.word)}`);
+                            setInputValue(item.word);
+                          }
+                        }}
+                        className="text-lg font-medium cursor-pointer hover:text-blue-400"
+                      >
+                        {item.word && <span className="mr-2">{item.word}</span>}
+                        {item.reading && (
+                          <span className="text-gray-400">
+                            ({item.reading})
+                          </span>
+                        )}
+                      </button>
 
-                    {/* Display English meanings */}
-                    {searchResults.data[0]?.senses &&
-                      searchResults.data[0].senses.length > 0 && (
-                        <div className="mt-2 ml-2 text-gray-700">
-                          <p className="text-sm">
-                            <span className="font-medium">뜻: </span>
-                            {(searchResults.data[0]?.senses || [])
-                              .slice(0, 2)
-                              .map((sense, i) => {
-                                const definitions =
-                                  sense.english_definitions || [];
-                                return (
-                                  <span
-                                    key={i}
-                                    className="mr-2"
-                                  >
-                                    {i + 1}. {definitions.join(", ")}
-                                    {i === 0 &&
-                                      searchResults.data[0]?.senses &&
-                                      searchResults.data[0].senses.length > 1 &&
-                                      "; "}
-                                  </span>
-                                );
-                              })}
-                          </p>
-                          {searchResults.data[0]?.senses?.[0]
-                            ?.parts_of_speech &&
-                            searchResults.data[0]?.senses[0].parts_of_speech
-                              .length > 0 && (
-                              <p className="text-xs text-gray-500 mt-1">
-                                <span className="font-medium">품사: </span>
-                                {(
-                                  searchResults.data[0]?.senses[0]
-                                    .parts_of_speech || []
-                                ).join(", ")}
-                              </p>
-                            )}
-                        </div>
-                      )}
-                  </div>
-                )
-              )}
+                      {/* Display English meanings */}
+                      {searchResults.data[0]?.senses &&
+                        searchResults.data[0].senses.length > 0 && (
+                          <div className="mt-2 border-t border-gray-700 pt-2">
+                            <p className="text-gray-300">
+                              <span className="font-medium">뜻: </span>
+                              {(searchResults.data[0]?.senses || [])
+                                .slice(0, 2)
+                                .map((sense, i) => {
+                                  const definitions =
+                                    sense.english_definitions || [];
+                                  return (
+                                    <span
+                                      key={i}
+                                      className="mr-2"
+                                    >
+                                      {i + 1}. {definitions.join(", ")}
+                                      {i === 0 &&
+                                        searchResults.data[0]?.senses &&
+                                        searchResults.data[0].senses.length >
+                                          1 &&
+                                        "; "}
+                                    </span>
+                                  );
+                                })}
+                            </p>
+                            {searchResults.data[0]?.senses?.[0]
+                              ?.parts_of_speech &&
+                              searchResults.data[0]?.senses[0].parts_of_speech
+                                .length > 0 && (
+                                <p className="text-xs text-gray-500 mt-1">
+                                  <span className="font-medium">품사: </span>
+                                  {(
+                                    searchResults.data[0]?.senses[0]
+                                      .parts_of_speech || []
+                                  ).join(", ")}
+                                </p>
+                              )}
+                          </div>
+                        )}
+                    </Card>
+                  )
+                )}
+              </div>
+              <SourceLink
+                href={`https://jisho.org/search/${encodeURIComponent(
+                  inputValue
+                )}`}
+                source="jisho.org"
+              />
             </div>
           )}
-
-          <hr className="my-8 border-t border-gray-700" />
 
           {query && dictionaryResult && (
             <div className="mb-6">
               <h3 className="text-xl font-bold mb-3">뜻</h3>
-              {dictionaryResult.meanings.length > 0 ? (
-                <div className="space-y-2">
-                  {dictionaryResult.meanings.map((meaning, index) => (
-                    <p
-                      key={index}
-                      className="text-gray-300"
-                    >
-                      {index + 1}. {meaning}
-                    </p>
-                  ))}
-                  <a
-                    href={dictionaryResult.dictionaryLink}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-gray-600 hover:text-gray-400 mt-2 inline-block underline"
-                  >
-                    다음 사전으로 이동
-                  </a>
-                </div>
-              ) : (
-                <p className="text-gray-600">검색 결과가 없습니다.</p>
-              )}
+              <div className="space-y-4">
+                <Card>
+                  {dictionaryResult.meanings.length > 0 ? (
+                    <>
+                      <div className="space-y-2">
+                        {dictionaryResult.meanings.map((meaning, index) => (
+                          <p
+                            key={index}
+                            className="text-gray-300"
+                          >
+                            {index + 1}. {meaning}
+                          </p>
+                        ))}
+                      </div>
+                    </>
+                  ) : (
+                    <p className="text-gray-600">검색 결과가 없습니다.</p>
+                  )}
+                </Card>
+              </div>
+              <SourceLink
+                href={dictionaryResult.dictionaryLink}
+                source="다음 사전"
+              />
             </div>
           )}
 
@@ -310,27 +314,20 @@ export default function JapaneseSearch() {
               <h3 className="text-xl font-bold mb-3">예문</h3>
               <div className="space-y-4">
                 {exampleResults.results.slice(0, 2).map((example, index) => (
-                  <div
-                    key={index}
-                    className="border border-gray-700 rounded-md p-4 bg-gray-900"
-                  >
+                  <Card key={index}>
                     <div className="mb-3">
                       <p className="text-lg leading-relaxed">{example.kanji}</p>
                     </div>
                     <p className="text-gray-300 border-t border-gray-700 pt-2 mt-2">
                       {example.english}
                     </p>
-                  </div>
+                  </Card>
                 ))}
-                <a
-                  href={exampleResults.uri}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-gray-600 hover:text-gray-400 mt-2 inline-block underline"
-                >
-                  예문 더보기
-                </a>
               </div>
+              <SourceLink
+                href={exampleResults.uri}
+                source="jisho.org"
+              />
             </div>
           )}
         </div>
@@ -338,13 +335,10 @@ export default function JapaneseSearch() {
         <div className="lg:w-1/2">
           {Object.keys(kanjiResults).length > 0 && (
             <div className="mb-6">
-              <h2 className="text-xl font-bold mb-4">한자 쓰는 방법:</h2>
-              <div className="grid grid-cols-1 gap-4">
+              <h2 className="text-xl font-bold mb-3">한자 쓰는 방법</h2>
+              <div className="space-y-4">
                 {Object.entries(kanjiResults).map(([kanji, result]) => (
-                  <div
-                    key={kanji}
-                    className="border rounded p-4"
-                  >
+                  <Card key={kanji}>
                     <h3 className="text-2xl font-bold mb-2">{kanji}</h3>
                     {result.found ? (
                       <>
@@ -368,9 +362,13 @@ export default function JapaneseSearch() {
                     ) : (
                       <p>상세 정보를 찾을 수 없습니다.</p>
                     )}
-                  </div>
+                  </Card>
                 ))}
               </div>
+              <SourceLink
+                href="https://jisho.org"
+                source="jisho.org"
+              />
             </div>
           )}
         </div>
