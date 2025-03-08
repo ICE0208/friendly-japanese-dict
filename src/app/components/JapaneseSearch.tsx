@@ -253,8 +253,40 @@ export default function JapaneseSearch() {
             </div>
           )}
 
+          {query && dictionaryResult && (
+            <div className="mb-6 bg-white p-4 rounded-lg shadow">
+              <h3 className="text-xl font-bold mb-3 text-black">
+                다음 사전 결과:
+              </h3>
+              {dictionaryResult.meanings.length > 0 ? (
+                <div className="space-y-2">
+                  {dictionaryResult.meanings.map((meaning, index) => (
+                    <p
+                      key={index}
+                      className="text-gray-800"
+                    >
+                      {meaning}
+                    </p>
+                  ))}
+                  <a
+                    href={dictionaryResult.dictionaryLink}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-blue-600 hover:text-blue-800 mt-2 inline-block"
+                  >
+                    다음 사전에서 더 보기
+                  </a>
+                </div>
+              ) : (
+                <p className="text-gray-600">검색 결과가 없습니다.</p>
+              )}
+            </div>
+          )}
+        </div>
+
+        <div className="lg:w-1/2">
           {Object.keys(kanjiResults).length > 0 && (
-            <div className="mb-6 hidden lg:block">
+            <div className="mb-6">
               <h2 className="text-xl font-bold mb-4">한자 쓰는 방법:</h2>
               <div className="grid grid-cols-1 gap-4">
                 {Object.entries(kanjiResults).map(([kanji, result]) => (
@@ -291,76 +323,6 @@ export default function JapaneseSearch() {
             </div>
           )}
         </div>
-
-        <div className="lg:w-1/2">
-          {query && dictionaryResult && (
-            <div className="mb-6 bg-white p-4 rounded-lg shadow">
-              <h3 className="text-xl font-bold mb-3 text-black">
-                다음 사전 결과:
-              </h3>
-              {dictionaryResult.meanings.length > 0 ? (
-                <div className="space-y-2">
-                  {dictionaryResult.meanings.map((meaning, index) => (
-                    <p
-                      key={index}
-                      className="text-gray-800"
-                    >
-                      {meaning}
-                    </p>
-                  ))}
-                  <a
-                    href={dictionaryResult.dictionaryLink}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-blue-600 hover:text-blue-800 mt-2 inline-block"
-                  >
-                    다음 사전에서 더 보기
-                  </a>
-                </div>
-              ) : (
-                <p className="text-gray-600">검색 결과가 없습니다.</p>
-              )}
-            </div>
-          )}
-        </div>
-
-        {Object.keys(kanjiResults).length > 0 && (
-          <div className="mb-6 lg:hidden">
-            <h2 className="text-xl font-bold mb-4">한자 쓰는 방법:</h2>
-            <div className="grid grid-cols-1 gap-4">
-              {Object.entries(kanjiResults).map(([kanji, result]) => (
-                <div
-                  key={kanji}
-                  className="border rounded p-4"
-                >
-                  <h3 className="text-2xl font-bold mb-2">{kanji}</h3>
-                  {result.found ? (
-                    <>
-                      {result.strokeOrderGifUri && (
-                        <div className="mb-2">
-                          <p className="font-bold mb-1">획순:</p>
-                          <img
-                            src={result.strokeOrderGifUri}
-                            alt={`${kanji}의 획순`}
-                            className="border"
-                          />
-                        </div>
-                      )}
-                      <p className="mb-1">
-                        <strong>훈독:</strong> {result.kunyomi?.join(", ")}
-                      </p>
-                      <p>
-                        <strong>음독:</strong> {result.onyomi?.join(", ")}
-                      </p>
-                    </>
-                  ) : (
-                    <p>상세 정보를 찾을 수 없습니다.</p>
-                  )}
-                </div>
-              ))}
-            </div>
-          </div>
-        )}
       </div>
     </div>
   );
