@@ -9,6 +9,7 @@ interface KanjiResult {
   meaning?: string;
   kunyomi?: string[];
   onyomi?: string[];
+  dictionaryLink: string;
 }
 
 interface JapaneseWord {
@@ -29,14 +30,16 @@ export default function JapaneseSearch() {
     [key: string]: KanjiResult;
   }>({});
   const [loading, setLoading] = useState(false);
+  const [searchedWord, setSearchedWord] = useState("");
 
   const handleSearch = async () => {
     if (!searchWord.trim()) return;
 
     setLoading(true);
+    setSearchedWord(searchWord);
 
     try {
-      // Search for the word
+      // Search using Jisho
       const wordResult = await jisho.searchForPhrase(searchWord);
       setSearchResults(wordResult);
 
@@ -47,11 +50,10 @@ export default function JapaneseSearch() {
           // Check if character is kanji
           const result = await jisho.searchForKanji(char);
           kanjiDetails[char] = {
-            found: result.found,
-            strokeOrderGifUri: result.strokeOrderGifUri,
-            meaning: result.meaning,
-            kunyomi: result.kunyomi,
-            onyomi: result.onyomi,
+            ...result,
+            dictionaryLink: `https://ja.dict.naver.com/#/search?query=${encodeURIComponent(
+              char
+            )}`,
           };
         }
       }
@@ -63,6 +65,12 @@ export default function JapaneseSearch() {
     }
   };
 
+  const handleKeyPress = (e: React.KeyboardEvent) => {
+    if (e.key === "Enter") {
+      handleSearch();
+    }
+  };
+
   return (
     <div className="max-w-4xl mx-auto p-4">
       <div className="flex gap-2 mb-6">
@@ -70,7 +78,8 @@ export default function JapaneseSearch() {
           type="text"
           value={searchWord}
           onChange={(e) => setSearchWord(e.target.value)}
-          placeholder="日本語の単語を入力してください"
+          onKeyPress={handleKeyPress}
+          placeholder="일본어 단어를 입력하세요"
           className="flex-1 p-2 border border-gray-300 rounded"
         />
         <button
@@ -78,13 +87,26 @@ export default function JapaneseSearch() {
           disabled={loading}
           className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 disabled:bg-gray-400"
         >
-          {loading ? "検索中..." : "検索"}
+          {loading ? "검색 중..." : "검색"}
         </button>
       </div>
 
+      {searchedWord && (
+        <div className="mb-6">
+          <h3 className="font-bold mb-3">네이버 사전 결과:</h3>
+          <iframe
+            src={`https://ja.dict.naver.com/#/search?query=${encodeURIComponent(
+              searchedWord
+            )}`}
+            className="w-full h-[400px] border-0"
+            title="네이버 일본어 사전"
+          />
+        </div>
+      )}
+
       {searchResults && (
         <div className="mb-6">
-          <h2 className="text-xl font-bold mb-2">検索結果:</h2>
+          <h2 className="text-xl font-bold mb-2">Jisho 검색 결과:</h2>
           {searchResults.data?.[0]?.japanese?.map(
             (item: JapaneseWord, index: number) => (
               <div
