@@ -19,6 +19,8 @@ export async function GET(request: NextRequest) {
     let result;
     if (type === "kanji") {
       result = await jisho.searchForKanji(query);
+    } else if (type === "examples") {
+      result = await jisho.searchForExamples(query);
     } else {
       result = await jisho.searchForPhrase(query);
     }

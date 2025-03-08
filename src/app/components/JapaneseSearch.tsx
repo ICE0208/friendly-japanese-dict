@@ -38,6 +38,23 @@ interface SuggestionItem {
   item: string;
 }
 
+interface ExamplePiece {
+  lifted: string;
+  unlifted: string;
+}
+
+interface ExampleResult {
+  kanji: string;
+  kana: string;
+  english: string;
+  pieces: ExamplePiece[];
+}
+
+interface ExampleSearchResult {
+  uri: string;
+  results: ExampleResult[];
+}
+
 export default function JapaneseSearch() {
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -53,6 +70,8 @@ export default function JapaneseSearch() {
   }>({});
   const [dictionaryResult, setDictionaryResult] =
     useState<DictionaryResult | null>(null);
+  const [exampleResults, setExampleResults] =
+    useState<ExampleSearchResult | null>(null);
 
   useEffect(() => {
     const search = async () => {
@@ -60,14 +79,16 @@ export default function JapaneseSearch() {
 
       setLoading(true);
       try {
-        const [wordResult, daumResponse] = await Promise.all([
+        const [wordResult, daumResponse, examplesResponse] = await Promise.all([
           jisho.searchForPhrase(query),
           fetch(`/api/daum-dict?query=${encodeURIComponent(query)}`),
+          jisho.searchForExamples(query),
         ]);
 
         setSearchResults(wordResult);
         const daumResult = await daumResponse.json();
         setDictionaryResult(daumResult);
+        setExampleResults(examplesResponse);
 
         const kanjiDetails: { [key: string]: KanjiResult } = {};
         const kanjiPromises = [];
@@ -181,7 +202,7 @@ export default function JapaneseSearch() {
         <div className="lg:w-1/2">
           {searchResults && (
             <div className="mb-6">
-              <h2 className="text-xl font-bold mb-2">Jisho 검색 결과:</h2>
+              <h2 className="text-xl font-bold mb-2">연관 검색어</h2>
               {searchResults.data?.[0]?.japanese?.map(
                 (item: JapaneseWord, index: number) => (
                   <div
@@ -192,6 +213,7 @@ export default function JapaneseSearch() {
                       onClick={() => {
                         if (item.word) {
                           router.push(`?q=${encodeURIComponent(item.word)}`);
+                          setInputValue(item.word);
                         }
                       }}
                       className="px-2 py-1 rounded-md transition-colors hover:bg-gray-100 group font-medium cursor-pointer"
@@ -257,7 +279,7 @@ export default function JapaneseSearch() {
 
           {query && dictionaryResult && (
             <div className="mb-6">
-              <h3 className="text-xl font-bold mb-3">다음 사전 결과:</h3>
+              <h3 className="text-xl font-bold mb-3">뜻</h3>
               {dictionaryResult.meanings.length > 0 ? (
                 <div className="space-y-2">
                   {dictionaryResult.meanings.map((meaning, index) => (
@@ -274,12 +296,41 @@ export default function JapaneseSearch() {
                     rel="noopener noreferrer"
                     className="text-gray-600 hover:text-gray-400 mt-2 inline-block underline"
                   >
-                    다음 사전에서 더 보기
+                    다음 사전으로 이동
                   </a>
                 </div>
               ) : (
                 <p className="text-gray-600">검색 결과가 없습니다.</p>
               )}
+            </div>
+          )}
+
+          {query && exampleResults && exampleResults.results.length > 0 && (
+            <div className="mb-6">
+              <h3 className="text-xl font-bold mb-3">예문</h3>
+              <div className="space-y-4">
+                {exampleResults.results.slice(0, 2).map((example, index) => (
+                  <div
+                    key={index}
+                    className="border border-gray-700 rounded-md p-4 bg-gray-900"
+                  >
+                    <div className="mb-3">
+                      <p className="text-lg leading-relaxed">{example.kanji}</p>
+                    </div>
+                    <p className="text-gray-300 border-t border-gray-700 pt-2 mt-2">
+                      {example.english}
+                    </p>
+                  </div>
+                ))}
+                <a
+                  href={exampleResults.uri}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-gray-600 hover:text-gray-400 mt-2 inline-block underline"
+                >
+                  예문 더보기
+                </a>
+              </div>
             </div>
           )}
         </div>
