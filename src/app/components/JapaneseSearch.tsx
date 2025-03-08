@@ -1,7 +1,8 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { jisho } from "../lib/jisho";
+import { useRouter, useSearchParams } from "next/navigation";
 
 interface KanjiResult {
   found: boolean;
@@ -28,54 +29,104 @@ interface DictionaryResult {
   dictionaryLink: string;
 }
 
+interface SuggestionItem {
+  key: string;
+  item: string;
+}
+
 export default function JapaneseSearch() {
-  const [searchWord, setSearchWord] = useState("");
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const query = searchParams.get("q") || "";
+
+  const [inputValue, setInputValue] = useState(query);
+  const [suggestions, setSuggestions] = useState<SuggestionItem[]>([]);
+  const [showSuggestions, setShowSuggestions] = useState(false);
+  const [loading, setLoading] = useState(false);
   const [searchResults, setSearchResults] = useState<JishoResult | null>(null);
   const [kanjiResults, setKanjiResults] = useState<{
     [key: string]: KanjiResult;
   }>({});
   const [dictionaryResult, setDictionaryResult] =
     useState<DictionaryResult | null>(null);
-  const [loading, setLoading] = useState(false);
-  const [searchedWord, setSearchedWord] = useState("");
 
-  const handleSearch = async () => {
-    if (!searchWord.trim()) return;
+  useEffect(() => {
+    const search = async () => {
+      if (!query) return;
 
-    setLoading(true);
-    setSearchedWord(searchWord);
+      setLoading(true);
+      try {
+        const [wordResult, daumResponse] = await Promise.all([
+          jisho.searchForPhrase(query),
+          fetch(`/api/daum-dict?query=${encodeURIComponent(query)}`),
+        ]);
 
-    try {
-      // Search using Jisho
-      const wordResult = await jisho.searchForPhrase(searchWord);
-      setSearchResults(wordResult);
+        setSearchResults(wordResult);
+        const daumResult = await daumResponse.json();
+        setDictionaryResult(daumResult);
 
-      // Search using Daum dictionary
-      const daumResponse = await fetch(
-        `/api/daum-dict?query=${encodeURIComponent(searchWord)}`
-      );
-      const daumResult = await daumResponse.json();
-      setDictionaryResult(daumResult);
+        const kanjiDetails: { [key: string]: KanjiResult } = {};
+        const kanjiPromises = [];
 
-      // For each kanji in the search word, get its details
-      const kanjiDetails: { [key: string]: KanjiResult } = {};
-      for (const char of searchWord) {
-        if (/[\u4e00-\u9faf]/.test(char)) {
-          const result = await jisho.searchForKanji(char);
-          kanjiDetails[char] = {
-            ...result,
-            dictionaryLink: `https://dic.daum.net/search.do?q=${encodeURIComponent(
-              char
-            )}&dic=jp`,
-          };
+        for (const char of query) {
+          if (/[\u4e00-\u9faf]/.test(char)) {
+            kanjiPromises.push(
+              jisho.searchForKanji(char).then((result) => {
+                kanjiDetails[char] = {
+                  ...result,
+                  dictionaryLink: `https://dic.daum.net/search.do?q=${encodeURIComponent(
+                    char
+                  )}&dic=jp`,
+                };
+              })
+            );
+          }
         }
+
+        await Promise.all(kanjiPromises);
+        setKanjiResults(kanjiDetails);
+      } catch (error) {
+        console.error("Error searching:", error);
+      } finally {
+        setLoading(false);
       }
-      setKanjiResults(kanjiDetails);
-    } catch (error) {
-      console.error("Error searching:", error);
-    } finally {
-      setLoading(false);
+    };
+
+    search();
+  }, [query]);
+
+  const handleInputChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    setInputValue(value);
+
+    if (value.trim().length > 0) {
+      try {
+        const response = await fetch(
+          `/api/naver-suggest?query=${encodeURIComponent(value)}`
+        );
+        const data = await response.json();
+        setSuggestions(data.suggestions);
+        setShowSuggestions(true);
+      } catch (error) {
+        console.error("Error fetching suggestions:", error);
+        setSuggestions([]);
+      }
+    } else {
+      setSuggestions([]);
+      setShowSuggestions(false);
     }
+  };
+
+  const handleSearch = () => {
+    if (!inputValue.trim()) return;
+    router.push(`?q=${encodeURIComponent(inputValue)}`);
+    setShowSuggestions(false);
+  };
+
+  const handleSuggestionClick = (suggestion: SuggestionItem) => {
+    router.push(`?q=${encodeURIComponent(suggestion.key)}`);
+    setInputValue(suggestion.key);
+    setShowSuggestions(false);
   };
 
   const handleKeyPress = (e: React.KeyboardEvent) => {
@@ -86,15 +137,33 @@ export default function JapaneseSearch() {
 
   return (
     <div className="max-w-4xl mx-auto p-4">
-      <div className="flex gap-2 mb-6">
-        <input
-          type="text"
-          value={searchWord}
-          onChange={(e) => setSearchWord(e.target.value)}
-          onKeyPress={handleKeyPress}
-          placeholder="일본어 단어를 입력하세요"
-          className="flex-1 p-2 border border-gray-300 rounded"
-        />
+      <div className="flex gap-2 mb-6 relative">
+        <div className="flex-1 relative">
+          <input
+            type="text"
+            value={inputValue}
+            onChange={handleInputChange}
+            onKeyPress={handleKeyPress}
+            onBlur={() => {
+              setTimeout(() => setShowSuggestions(false), 200);
+            }}
+            placeholder="일본어 단어를 입력하세요"
+            className="w-full p-2 border border-gray-300 rounded"
+          />
+          {showSuggestions && suggestions.length > 0 && (
+            <div className="absolute w-full mt-1 bg-white border border-gray-200 rounded-md shadow-lg z-10 max-h-60 overflow-y-auto">
+              {suggestions.map((suggestion, index) => (
+                <button
+                  key={`${suggestion.key}-${index}`}
+                  className="w-full px-4 py-2 text-left hover:bg-gray-100 focus:bg-gray-100 focus:outline-none text-gray-900 font-medium"
+                  onClick={() => handleSuggestionClick(suggestion)}
+                >
+                  {suggestion.item}
+                </button>
+              ))}
+            </div>
+          )}
+        </div>
         <button
           onClick={handleSearch}
           disabled={loading}
@@ -118,39 +187,7 @@ export default function JapaneseSearch() {
                     <button
                       onClick={() => {
                         if (item.word) {
-                          const word = item.word;
-                          setSearchWord(word);
-                          setLoading(true);
-                          setSearchedWord(word);
-
-                          jisho
-                            .searchForPhrase(word)
-                            .then((wordResult) => {
-                              setSearchResults(wordResult);
-
-                              const kanjiDetails: {
-                                [key: string]: KanjiResult;
-                              } = {};
-                              for (const char of word) {
-                                if (/[\u4e00-\u9faf]/.test(char)) {
-                                  jisho.searchForKanji(char).then((result) => {
-                                    kanjiDetails[char] = {
-                                      ...result,
-                                      dictionaryLink: `https://dic.daum.net/search.do?q=${encodeURIComponent(
-                                        char
-                                      )}&dic=jp`,
-                                    };
-                                    setKanjiResults({ ...kanjiDetails });
-                                  });
-                                }
-                              }
-                            })
-                            .catch((error) => {
-                              console.error("Error searching:", error);
-                            })
-                            .finally(() => {
-                              setLoading(false);
-                            });
+                          router.push(`?q=${encodeURIComponent(item.word)}`);
                         }
                       }}
                       className="px-2 py-1 rounded-md transition-colors hover:bg-gray-100 group font-medium"
@@ -212,9 +249,11 @@ export default function JapaneseSearch() {
         </div>
 
         <div className="lg:w-1/2">
-          {searchedWord && dictionaryResult && (
+          {query && dictionaryResult && (
             <div className="mb-6 bg-white p-4 rounded-lg shadow">
-              <h3 className="text-xl font-bold mb-3">다음 사전 결과:</h3>
+              <h3 className="text-xl font-bold mb-3 text-black">
+                다음 사전 결과:
+              </h3>
               {dictionaryResult.meanings.length > 0 ? (
                 <div className="space-y-2">
                   {dictionaryResult.meanings.map((meaning, index) => (
