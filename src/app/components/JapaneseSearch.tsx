@@ -21,6 +21,10 @@ interface JapaneseWord {
 interface JishoResult {
   data: Array<{
     japanese: JapaneseWord[];
+    senses?: Array<{
+      english_definitions?: string[];
+      parts_of_speech?: string[];
+    }>;
   }>;
 }
 
@@ -182,7 +186,7 @@ export default function JapaneseSearch() {
                 (item: JapaneseWord, index: number) => (
                   <div
                     key={index}
-                    className="mb-2"
+                    className="mb-4"
                   >
                     <button
                       onClick={() => {
@@ -203,6 +207,46 @@ export default function JapaneseSearch() {
                         </span>
                       )}
                     </button>
+
+                    {/* Display English meanings */}
+                    {searchResults.data[0]?.senses &&
+                      searchResults.data[0].senses.length > 0 && (
+                        <div className="mt-2 ml-2 text-gray-700">
+                          <p className="text-sm">
+                            <span className="font-medium">뜻: </span>
+                            {(searchResults.data[0]?.senses || [])
+                              .slice(0, 2)
+                              .map((sense, i) => {
+                                const definitions =
+                                  sense.english_definitions || [];
+                                return (
+                                  <span
+                                    key={i}
+                                    className="mr-2"
+                                  >
+                                    {i + 1}. {definitions.join(", ")}
+                                    {i === 0 &&
+                                      searchResults.data[0]?.senses &&
+                                      searchResults.data[0].senses.length > 1 &&
+                                      "; "}
+                                  </span>
+                                );
+                              })}
+                          </p>
+                          {searchResults.data[0]?.senses?.[0]
+                            ?.parts_of_speech &&
+                            searchResults.data[0]?.senses[0].parts_of_speech
+                              .length > 0 && (
+                              <p className="text-xs text-gray-500 mt-1">
+                                <span className="font-medium">품사: </span>
+                                {(
+                                  searchResults.data[0]?.senses[0]
+                                    .parts_of_speech || []
+                                ).join(", ")}
+                              </p>
+                            )}
+                        </div>
+                      )}
                   </div>
                 )
               )}
