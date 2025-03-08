@@ -177,7 +177,7 @@ export default function JapaneseSearch() {
         </button>
       </div>
 
-      <div className="flex flex-col lg:flex lg:flex-row lg:gap-6">
+      <div className="flex flex-col lg:flex lg:flex-row lg:gap-12">
         <div className="lg:w-1/2">
           {searchResults && (
             <div className="mb-6">
@@ -194,7 +194,7 @@ export default function JapaneseSearch() {
                           router.push(`?q=${encodeURIComponent(item.word)}`);
                         }
                       }}
-                      className="px-2 py-1 rounded-md transition-colors hover:bg-gray-100 group font-medium"
+                      className="px-2 py-1 rounded-md transition-colors hover:bg-gray-100 group font-medium cursor-pointer"
                     >
                       {item.word && (
                         <span className="mr-2 group-hover:text-gray-900">
@@ -253,26 +253,26 @@ export default function JapaneseSearch() {
             </div>
           )}
 
+          <hr className="my-8 border-t border-gray-700" />
+
           {query && dictionaryResult && (
-            <div className="mb-6 bg-white p-4 rounded-lg shadow">
-              <h3 className="text-xl font-bold mb-3 text-black">
-                다음 사전 결과:
-              </h3>
+            <div className="mb-6">
+              <h3 className="text-xl font-bold mb-3">다음 사전 결과:</h3>
               {dictionaryResult.meanings.length > 0 ? (
                 <div className="space-y-2">
                   {dictionaryResult.meanings.map((meaning, index) => (
                     <p
                       key={index}
-                      className="text-gray-800"
+                      className="text-gray-300"
                     >
-                      {meaning}
+                      {index + 1}. {meaning}
                     </p>
                   ))}
                   <a
                     href={dictionaryResult.dictionaryLink}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="text-blue-600 hover:text-blue-800 mt-2 inline-block"
+                    className="text-gray-600 hover:text-gray-400 mt-2 inline-block underline"
                   >
                     다음 사전에서 더 보기
                   </a>
