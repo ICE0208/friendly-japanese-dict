@@ -25,6 +25,31 @@ const SearchForm = ({
     useState(showSuggestions);
   const [selectedIndex, setSelectedIndex] = useState(-1);
   const formRef = useRef<HTMLDivElement>(null);
+  const suggestionsContainerRef = useRef<HTMLDivElement>(null);
+  const suggestionRefs = useRef<(HTMLButtonElement | null)[]>([]);
+
+  useEffect(() => {
+    if (
+      selectedIndex >= 0 &&
+      suggestionRefs.current[selectedIndex] &&
+      suggestionsContainerRef.current
+    ) {
+      const container = suggestionsContainerRef.current;
+      const selectedItem = suggestionRefs.current[selectedIndex];
+
+      const itemTop = selectedItem.offsetTop;
+      const itemBottom = itemTop + selectedItem.offsetHeight;
+
+      const containerTop = container.scrollTop;
+      const containerBottom = containerTop + container.offsetHeight;
+
+      if (itemTop < containerTop) {
+        container.scrollTop = itemTop;
+      } else if (itemBottom > containerBottom) {
+        container.scrollTop = itemBottom - container.offsetHeight;
+      }
+    }
+  }, [selectedIndex]);
 
   useEffect(() => {
     setInputValue(initialValue || "");
@@ -37,8 +62,13 @@ const SearchForm = ({
   useEffect(() => {
     if (localShowSuggestions) {
       setSelectedIndex(-1);
+      suggestionRefs.current = suggestions.map(() => null);
+
+      if (suggestionsContainerRef.current) {
+        suggestionsContainerRef.current.scrollTop = 0;
+      }
     }
-  }, [localShowSuggestions]);
+  }, [localShowSuggestions, suggestions]);
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -58,6 +88,11 @@ const SearchForm = ({
     onInputChange(e);
     setLocalShowSuggestions(true);
     setSelectedIndex(-1);
+
+    // 스크롤을 맨 위로 초기화
+    if (suggestionsContainerRef.current) {
+      suggestionsContainerRef.current.scrollTop = 0;
+    }
   };
 
   const handleInputClick = () => {
@@ -123,10 +158,16 @@ const SearchForm = ({
           className="w-full p-2 border border-gray-300 rounded"
         />
         {localShowSuggestions && showSuggestions && suggestions.length > 0 && (
-          <div className="absolute w-full mt-1 bg-white border border-gray-200 rounded-md shadow-lg z-10 max-h-60 overflow-y-auto">
+          <div
+            ref={suggestionsContainerRef}
+            className="absolute w-full mt-1 bg-white border border-gray-200 rounded-md shadow-lg z-10 max-h-60 overflow-y-auto"
+          >
             {suggestions.map((suggestion, index) => (
               <button
                 key={`${index}`}
+                ref={(el) => {
+                  suggestionRefs.current[index] = el;
+                }}
                 className={`w-full px-4 py-2 text-left focus:outline-none ${
                   selectedIndex === index
                     ? "bg-gray-200 text-gray-900 font-semibold"
