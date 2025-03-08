@@ -2,6 +2,7 @@ import React from "react";
 import Card from "./Card";
 import SourceLink from "./SourceLink";
 import { KanjiResult } from "../types/japanese";
+import Image from "next/image";
 
 interface KanjiResultsProps {
   kanjiResults: { [key: string]: KanjiResult };
@@ -24,9 +25,11 @@ const KanjiResults = ({ kanjiResults }: KanjiResultsProps) => {
                 {result.strokeOrderGifUri && (
                   <div className="mb-2">
                     <p className="font-bold mb-1">획순:</p>
-                    <img
+                    <Image
                       src={result.strokeOrderGifUri}
                       alt={`${kanji}의 획순`}
+                      width={200}
+                      height={200}
                       className="border"
                     />
                   </div>
