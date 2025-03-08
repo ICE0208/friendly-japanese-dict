@@ -1,4 +1,4 @@
-import { SuggestionItem } from "@/app/types/japanese";
+import { SuggestionItem } from "@/types/japanese";
 import { NextResponse } from "next/server";
 
 // Define types for Naver API response

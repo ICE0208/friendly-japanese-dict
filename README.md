@@ -1,36 +1,81 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# I Hate Kanji (한자 검색 도구)
 
-## Getting Started
+이 프로젝트는 일본어 한자 및 단어를 검색하고 학습할 수 있는 웹 애플리케이션입니다. 다양한 사전 API를 활용하여 한자의 의미, 예문, 관련 단어 등을 제공합니다.
 
-First, run the development server:
+## 주요 기능
+
+- 일본어 한자 및 단어 검색
+- 한자의 상세 정보 (음독, 훈독, 부수, 획수 등) 제공
+- 예문 및 관련 단어 검색
+- 자동 완성 기능
+- 다음 사전 및 Jisho API 연동
+
+## 기술 스택
+
+- Next.js 15.2.1
+- React 19
+- TypeScript
+- TailwindCSS
+- Cheerio (웹 스크래핑)
+- Unofficial Jisho API
+
+## 설치 방법
+
+1. 저장소를 클론합니다:
+
+   ```bash
+   git clone https://github.com/yourusername/i-hate-kanji.git
+   cd i-hate-kanji
+   ```
+
+2. 의존성 패키지를 설치합니다:
+   ```bash
+   npm install
+   ```
+
+## 실행 방법
+
+### 개발 모드로 실행
+
+개발 서버를 시작하려면 다음 명령어를 실행합니다:
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+이후 브라우저에서 [http://localhost:3000](http://localhost:3000)으로 접속하여 애플리케이션을 확인할 수 있습니다.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+### 프로덕션 빌드
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+프로덕션용 빌드를 생성하려면 다음 명령어를 실행합니다:
 
-## Learn More
+```bash
+npm run build
+```
 
-To learn more about Next.js, take a look at the following resources:
+빌드된 애플리케이션을 실행하려면 다음 명령어를 실행합니다:
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+```bash
+npm run start
+```
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## 프로젝트 구조
 
-## Deploy on Vercel
+```
+i-hate-kanji/
+├── src/
+│   ├── app/
+│   │   ├── api/           # API 라우트
+│   │   ├── page.tsx       # 메인 페이지
+│   │   └── layout.tsx     # 레이아웃 컴포넌트
+│   ├── components/        # React 컴포넌트
+│   ├── lib/               # 유틸리티 함수
+│   ├── types/             # TypeScript 타입 정의
+├── public/                # 정적 파일
+├── next.config.ts         # Next.js 설정
+└── package.json           # 프로젝트 의존성 및 스크립트
+```
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## 라이센스
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+MIT

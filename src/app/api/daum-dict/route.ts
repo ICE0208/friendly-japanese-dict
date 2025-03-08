@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { load } from "cheerio";
-import { WordInfo, DictionaryResult } from "@/app/types/japanese";
+import { WordInfo, DictionaryResult } from "@/types/japanese";
 
 export async function GET(request: Request) {
   try {

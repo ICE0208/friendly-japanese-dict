@@ -1,4 +1,4 @@
-import JapaneseSearch from "./components/JapaneseSearch";
+import JapaneseSearch from "../components/JapaneseSearch";
 
 export default function Home() {
   return (
