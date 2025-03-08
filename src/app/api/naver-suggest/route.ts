@@ -31,7 +31,6 @@ export async function GET(request: Request) {
 
     // Process main suggestions
     if (data.items && data.items[0]) {
-      console.log(data.items[0]);
       data.items[0].forEach((item: NaverSuggestionItem) => {
         if (item && item.length >= 4) {
           const reading = item[0][0]; // Hiragana reading
