@@ -31,6 +31,7 @@ const KanjiResults = ({ kanjiResults }: KanjiResultsProps) => {
                       width={200}
                       height={200}
                       className="border"
+                      unoptimized
                     />
                   </div>
                 )}
