@@ -146,9 +146,11 @@ const SearchForm = ({
       <button
         onClick={handleSearch}
         disabled={loading}
-        className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 disabled:bg-gray-400"
+        className={`px-4 py-2 text-white rounded ${
+          loading ? "bg-gray-400" : "bg-gray-700 hover:bg-gray-800"
+        }`}
       >
-        {loading ? "검색 중..." : "검색"}
+        검색
       </button>
     </div>
   );
