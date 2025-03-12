@@ -23,17 +23,7 @@ export async function GET(request: NextRequest) {
         method: "GET",
         headers: {
           accept: "application/json",
-          //   authorization:
-          //     "PPG 21745c2c-f7cc-4fce-88fd-5b9b30192b4c:XRRKmAY0CAEjnwQ5tZqiqQ==",
-          //   "content-type": "application/x-www-form-urlencoded; charset=UTF-8",
-          //   "sec-ch-ua":
-          //     '"Not(A:Brand";v="99", "Google Chrome";v="133", "Chromium";v="133"',
-          //   "sec-ch-ua-mobile": "?0",
-          //   "sec-ch-ua-platform": '"macOS"',
-          //   timestamp: Date.now().toString(),
           "x-apigw-partnerid": "papago",
-          //   Referer: "https://papago.naver.com/",
-          //   "Referrer-Policy": "origin",
         },
       }
     );
