@@ -1,5 +1,5 @@
 import { SimpleSearchApiResponse } from "@/types/simple-search-api";
-import { Fragment } from "react";
+import { Fragment, useEffect, useState } from "react";
 
 interface DragSearchResultProps {
   position: {
@@ -13,11 +13,21 @@ export default function DragSearchResult({
   position: { x, y },
   resultData,
 }: DragSearchResultProps) {
+  const [isRightSide, setIsRightSide] = useState(false);
+
+  useEffect(() => {
+    // Check if x position is in the right half of the viewport
+    setIsRightSide(x > window.innerWidth / 2);
+  }, [x]);
+
   return (
     <div
       className="absolute"
       style={{
-        left: `${x}px`,
+        left: isRightSide ? "auto" : `${x}px`,
+        right: isRightSide
+          ? `${document.documentElement.clientWidth - x}px`
+          : "auto",
         top: `${y}px`,
       }}
     >
