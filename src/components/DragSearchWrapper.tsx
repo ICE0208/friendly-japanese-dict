@@ -46,7 +46,8 @@ export default function DragSearchWrapper({
     <>
       {children}
       {draggedText &&
-        dragSearchResult?.items &&
+        dragSearchResult &&
+        dragSearchResult.items.length > 0 &&
         createPortal(
           <DragSearchResult
             position={position}
