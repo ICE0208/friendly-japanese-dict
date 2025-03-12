@@ -16,6 +16,7 @@ import RelatedSearchResults from "./RelatedSearchResults";
 import DictionaryResults from "./DictionaryResults";
 import ExampleResults from "./ExampleResults";
 import KanjiResults from "./KanjiResults";
+import DragSearchWrapper from "./DragSearchWrapper";
 
 export default function JapaneseSearch() {
   const router = useRouter();
@@ -153,32 +154,34 @@ export default function JapaneseSearch() {
         loading={loading}
       />
 
-      <div className="flex flex-col lg:flex lg:flex-row lg:gap-12">
-        <div className="lg:w-1/2">
-          {query && dictionaryResult && (
-            <DictionaryResults
-              dictionaryResult={dictionaryResult}
-              onWordClick={handleWordClick}
-            />
-          )}
-          {query && exampleResults && exampleResults.results.length > 0 && (
-            <ExampleResults exampleResults={exampleResults} />
-          )}
-          {searchResults && (
-            <RelatedSearchResults
-              searchResults={searchResults}
-              onWordClick={handleWordClick}
-              inputValue={inputValue}
-            />
-          )}
-        </div>
+      <DragSearchWrapper>
+        <div className="flex flex-col lg:flex lg:flex-row lg:gap-12">
+          <div className="lg:w-1/2">
+            {query && dictionaryResult && (
+              <DictionaryResults
+                dictionaryResult={dictionaryResult}
+                onWordClick={handleWordClick}
+              />
+            )}
+            {query && exampleResults && exampleResults.results.length > 0 && (
+              <ExampleResults exampleResults={exampleResults} />
+            )}
+            {searchResults && (
+              <RelatedSearchResults
+                searchResults={searchResults}
+                onWordClick={handleWordClick}
+                inputValue={inputValue}
+              />
+            )}
+          </div>
 
-        <div className="lg:w-1/2">
-          {Object.keys(kanjiResults).length > 0 && (
-            <KanjiResults kanjiResults={kanjiResults} />
-          )}
+          <div className="lg:w-1/2">
+            {Object.keys(kanjiResults).length > 0 && (
+              <KanjiResults kanjiResults={kanjiResults} />
+            )}
+          </div>
         </div>
-      </div>
+      </DragSearchWrapper>
     </div>
   );
 }
