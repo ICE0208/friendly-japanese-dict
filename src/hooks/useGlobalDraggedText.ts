@@ -17,6 +17,7 @@ function useGlobalDraggedText() {
 
   useEffect(() => {
     const handleSelection = (event: MouseEvent): void => {
+      // 간헐적으로 선택된 문자열이 초기화되지 않고 선택되는 문제가 있어서 타임아웃을 추가함
       setTimeout(() => {
         const selection = window.getSelection();
         const selectedText = selection?.toString().trim() || "";
