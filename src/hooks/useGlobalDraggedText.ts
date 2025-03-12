@@ -19,7 +19,7 @@ function useGlobalDraggedText() {
     const handleSelection = (event: MouseEvent): void => {
       setTimeout(() => {
         const selection = window.getSelection();
-        const selectedText = selection?.toString() || "";
+        const selectedText = selection?.toString().trim() || "";
         setPosition({ x: event.pageX + OFFSET.x, y: event.pageY + OFFSET.y });
         setDraggedText(selectedText);
       }, 0);
