@@ -16,8 +16,13 @@ import RelatedSearchResults from "./RelatedSearchResults";
 import DictionaryResults from "./DictionaryResults";
 import ExampleResults from "./ExampleResults";
 import KanjiResults from "./KanjiResults";
+import useGlobalDraggedText from "@/hooks/useGlobalDraggedText";
 
 export default function JapaneseSearch() {
+  const draggedText = useGlobalDraggedText();
+
+  console.log(draggedText);
+
   const router = useRouter();
   const searchParams = useSearchParams();
   const query = searchParams.get("q") || "";
