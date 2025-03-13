@@ -118,7 +118,7 @@ export default function JapaneseSearch() {
   );
 
   const debouncedHandleInputChange = useMemo(
-    () => debounce(handleInputChange, 500),
+    () => debounce(handleInputChange, 250),
     [handleInputChange]
   );
 
