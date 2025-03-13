@@ -16,7 +16,7 @@ export async function GET(request: Request) {
 
     const dictionaryLink = `https://dic.daum.net/search.do?q=${encodeURIComponent(
       query
-    )}&dic=jp`;
+    )}&dic=jp&search_first=Y`;
 
     // 한국어 헤더 추가하여 요청
     const response = await fetch(dictionaryLink, {
