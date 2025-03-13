@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback, useMemo } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { jisho } from "../lib/jisho";
 import {
@@ -10,13 +10,13 @@ import {
   SuggestionItem,
   ExampleSearchResult,
 } from "../types/japanese";
-
 import SearchForm from "./SearchForm";
 import RelatedSearchResults from "./RelatedSearchResults";
 import DictionaryResults from "./DictionaryResults";
 import ExampleResults from "./ExampleResults";
 import KanjiResults from "./KanjiResults";
 import DragSearchWrapper from "./DragSearchWrapper";
+import { debounce } from "lodash";
 
 export default function JapaneseSearch() {
   const router = useRouter();
@@ -83,36 +83,44 @@ export default function JapaneseSearch() {
     search();
   }, [query]);
 
-  const handleInputChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = e.target.value;
-    setInputValue(value);
+  const handleInputChange = useCallback(
+    async (e: React.ChangeEvent<HTMLInputElement>) => {
+      const value = e.target.value;
+      setInputValue(value);
 
-    if (value.length > 0) {
-      try {
-        const response = await fetch(
-          `/api/naver-suggest?query=${encodeURIComponent(value)}`
-        );
-        const data = (await response.json()) as {
-          suggestions: SuggestionItem[];
-        };
-        if (data && data.suggestions) {
-          setSuggestions(data.suggestions);
-          setShowSuggestions(data.suggestions.length > 0);
-        } else {
-          console.error("Invalid suggestions data format:", data);
+      if (value.length > 0) {
+        try {
+          const response = await fetch(
+            `/api/naver-suggest?query=${encodeURIComponent(value)}`
+          );
+          const data = (await response.json()) as {
+            suggestions: SuggestionItem[];
+          };
+          if (data && data.suggestions) {
+            setSuggestions(data.suggestions);
+            setShowSuggestions(data.suggestions.length > 0);
+          } else {
+            console.error("Invalid suggestions data format:", data);
+            setSuggestions([]);
+            setShowSuggestions(false);
+          }
+        } catch (error) {
+          console.error("Error fetching suggestions:", error);
           setSuggestions([]);
           setShowSuggestions(false);
         }
-      } catch (error) {
-        console.error("Error fetching suggestions:", error);
+      } else {
         setSuggestions([]);
         setShowSuggestions(false);
       }
-    } else {
-      setSuggestions([]);
-      setShowSuggestions(false);
-    }
-  };
+    },
+    [setInputValue, setSuggestions, setShowSuggestions]
+  );
+
+  const debouncedHandleInputChange = useMemo(
+    () => debounce(handleInputChange, 250),
+    [handleInputChange]
+  );
 
   const handleSearch = () => {
     if (inputValue.trim()) {
@@ -149,7 +157,7 @@ export default function JapaneseSearch() {
         onSearch={handleSearch}
         suggestions={suggestions}
         showSuggestions={showSuggestions}
-        onInputChange={handleInputChange}
+        onInputChange={debouncedHandleInputChange}
         onSuggestionClick={handleSuggestionClick}
         loading={loading}
       />
