@@ -41,10 +41,7 @@ function useGlobalDraggedText() {
       setTimeout(() => {
         const selection = window.getSelection();
         const selectedText = selection?.toString().trim() || "";
-
-        if (selectedText) {
-          setDraggedText(selectedText);
-        }
+        setDraggedText(selectedText);
       }, 0);
     };
 
@@ -54,18 +51,15 @@ function useGlobalDraggedText() {
       setTimeout(() => {
         const selection = window.getSelection();
         const selectedText = selection?.toString().trim() || "";
-
-        if (selectedText) {
-          setDraggedText(selectedText);
-        }
+        setDraggedText(selectedText);
       }, 0);
     };
 
     const handleSelectionChange = (): void => {
       setTimeout(() => {
         const selection = window.getSelection();
-
-        if (selection?.toString() === "") {
+        const selectedText = selection?.toString().trim() || "";
+        if (selectedText === "") {
           return;
         }
 
