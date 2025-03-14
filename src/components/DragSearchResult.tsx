@@ -1,37 +1,46 @@
 import { SimpleSearchApiResponse } from "@/types/simple-search-api";
-import { Fragment, useEffect, useState } from "react";
+import { Fragment } from "react";
 
 interface DragSearchResultProps {
   position: {
-    x: number;
-    y: number;
+    leftTop: {
+      x: number;
+      y: number;
+    };
+    rightTop: {
+      x: number;
+      y: number;
+    };
+    bottomLeft: {
+      x: number;
+      y: number;
+    };
+    bottomRight: {
+      x: number;
+      y: number;
+    };
   };
   resultData: SimpleSearchApiResponse;
 }
 
 export default function DragSearchResult({
-  position: { x, y },
+  position: { leftTop, rightTop, bottomLeft, bottomRight },
   resultData,
 }: DragSearchResultProps) {
-  const [isRightSide, setIsRightSide] = useState(false);
-
-  useEffect(() => {
-    // Check if x position is in the right half of the viewport
-    setIsRightSide(x > window.innerWidth / 2);
-  }, [x]);
+  const isRightSide = leftTop.x > window.innerWidth / 2;
 
   return (
     <div
-      className="absolute"
+      className="absolute w-5/12 max-w-90"
       style={{
-        left: isRightSide ? "auto" : `${x}px`,
+        left: isRightSide ? "auto" : `${leftTop.x}px`,
         right: isRightSide
-          ? `${document.documentElement.clientWidth - x}px`
+          ? `${document.documentElement.clientWidth - rightTop.x}px`
           : "auto",
-        top: `${y}px`,
+        top: `${Math.max(bottomLeft.y, bottomRight.y)}px`,
       }}
     >
-      <div className="bg-white border-black rounded-sm shadow-2xl text-black w-80 p-5 mb-16">
+      <div className="bg-white border-black rounded-sm shadow-2xl text-black p-5 mb-16 w-full">
         <div className="space-y-4">
           {resultData.items.map((item, index) => (
             <Fragment key={index}>
